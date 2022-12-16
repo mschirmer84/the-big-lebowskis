@@ -6,7 +6,7 @@ from aws_cdk import (
     aws_dynamodb as _dynamodb,
     aws_lambda as _lambda,
     aws_apigateway as _apigateway,
-
+    aws_s3_notifications as _s3n,
 )
 from constructs import Construct
 import os
@@ -23,24 +23,22 @@ class BeautifulFacesStack(Stack):
             supported_identity_providers=[_cognito.UserPoolClientIdentityProvider.COGNITO]
         )
         
-        auth = _apigateway.CognitoUserPoolsAuthorizer(self, "faceDetector", cognito_user_pools=[user_pool])
+        #auth = _apigateway.CognitoUserPoolsAuthorizer(self, "faceDetector", cognito_user_pools=[user_pool])
 
-        my_table = _dynamodb.Table(self, id='dynamoTable', table_name='beautiful_faces_metadata', partition_key=_dynamodb.Attribute(
+        faces_table = _dynamodb.Table(self, id='dynamoTable', table_name='beautiful_faces_metadata', partition_key=_dynamodb.Attribute(
             name='faceid', type=_dynamodb.AttributeType.STRING))
         
-        my_bucket = _s3.Bucket(self, id='s3bucket', bucket_name=f"beautifulfaces-upload-{self.account}")
+        faces_bucket = _s3.Bucket(self, id='s3bucket', bucket_name=f"beautifulfaces-upload-{self.account}")
         
-        my_lambda = _lambda.Function(self, id='lambdafunction', function_name="formlambda", runtime=_lambda.Runtime.PYTHON_3_7,
+        faces_lambda = _lambda.Function(self, id='lambdafunction', function_name="detect-faces", runtime=_lambda.Runtime.PYTHON_3_9,
                                      handler='index.handler',
-                                     code=_lambda.Code.from_asset(os.path.join("./", "lambda-handler")),
+                                     code=_lambda.Code.from_asset(os.path.join("./", "detect-faces-lambda")),
                                      environment={
-                                         'bucket': my_bucket.bucket_name,
-                                         'table': my_table.table_name
+                                        'table': faces_table.table_name,
+                                        'bucket': faces_bucket.bucket_name,
                                         },
                                      )
-        
-        my_bucket.grant_read_write(my_lambda)
-        my_table.grant_read_write_data(my_lambda)
-        my_api = _apigateway.LambdaRestApi(self, id='lambdaapi', rest_api_name='formapi', handler=my_lambda, proxy=True)
-        postData = my_api.root.add_resource("form")
-        postData.add_method("POST", authorizer=auth, authorization_type=_apigateway.AuthorizationType.COGNITO)  # POST images/files & metadata
+        faces_bucket.add_event_notification(_s3.EventType.OBJECT_CREATED, _s3n.LambdaDestination(faces_lambda))
+        faces_table.grant_read_write_data(faces_lambda)
+        faces_bucket.grant_read(faces_lambda)
+
