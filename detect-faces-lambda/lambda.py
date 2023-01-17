@@ -20,7 +20,7 @@ def handler(event, context):
         print(f"FaceId: {match['Face']['ExternalImageId']} similarity {match['Similarity']}%")
         table.put_item(
             Item={
-                'faceid':'face',
+                'type':'face',
                 'id': match['Face']['FaceId'],
                 'accuracy': f"{match['Similarity']}%",
                 'name': match['Face']['ExternalImageId'],
@@ -28,7 +28,7 @@ def handler(event, context):
             )
         response = table.get_item(
             Key={
-                'faceid': 'face',
+                'type': 'face',
                 }
             )
         print(response['Item'])

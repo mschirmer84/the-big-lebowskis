@@ -14,7 +14,7 @@ def handler(event, context):
     table = dynamodb.Table(os.environ['table'])
     result = table.get_item(
         Key={
-            'faceid': 'face',
+            'type': 'face',
         }
     )
 

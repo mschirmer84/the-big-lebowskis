@@ -56,11 +56,20 @@ class BeautifulFacesStack(Stack):
                                         },
                                     )
         faces_table.grant_read_data(frontend_api_lambda)
-        
-        frontend_api = _apigateway.LambdaRestApi(self, id='frontend_api_lambda', rest_api_name='frontend', handler=frontend_api_lambda, proxy=True)
 
         spa_bucket = _s3.Bucket(self, id='spabucket', bucket_name=f"beautifulfaces-frontend-{self.account}",
                 public_read_access=True, website_index_document='index.html', removal_policy=RemovalPolicy.DESTROY, auto_delete_objects=True)
+        
+        frontend_api = _apigateway.LambdaRestApi(self, id='frontend_api_lambda', rest_api_name='frontend',
+                handler=frontend_api_lambda,
+                proxy=True,
+                default_cors_preflight_options=_apigateway.CorsOptions(
+                    allow_origins=['*'],
+                    allow_methods=['*'],
+                    allow_headers=['*'],
+                    allow_credentials=True,
+                )
+        )
 
         spa_asset = AssetStaging(self, id='spa_asset',
                 source_path=os.path.join(os.getcwd(), "spa"),
