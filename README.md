@@ -1,3 +1,9 @@
+# Beautiful Faces
+
+# How to use
+1 - Load AWS rekogniion collection `beautiful_faces` with one photo of each person you want to identify
+2 - Drop an image.jpg in the faces bucket <beautifulfaces-upload-<your_account_id>
+3 - Refresh the web interface to see which photo in the `beautiful_faces` collection was identified and with what probality
 
 # Welcome to your CDK Python project!
 
