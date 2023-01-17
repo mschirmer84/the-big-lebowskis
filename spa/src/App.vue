@@ -1,12 +1,12 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
+import DetectionResults from "./components/DetectionResults.vue";
 </script>
 
 <template>
   <h1>Endless Faces; Most Beautiful</h1>
 
   <main>
-    <HelloWorld />
+    <DetectionResults />
   </main>
 </template>
 
