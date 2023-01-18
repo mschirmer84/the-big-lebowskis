@@ -10,7 +10,7 @@ def handler(event, context):
     table = dynamodb.Table(os.environ['table'])
     bucket = os.environ['bucket']
     
-    response = client.search_faces_by_image(CollectionId='beautiful-faces',
+    response = client.search_faces_by_image(CollectionId='beautiful_faces',
                                             Image={'S3Object':{'Bucket':bucket, 'Name':'image.jpg'}},
                                             FaceMatchThreshold=70,
                                             MaxFaces=1
