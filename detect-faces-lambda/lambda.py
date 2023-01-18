@@ -14,7 +14,7 @@ def handler(event, context):
         key = urllib.parse.unquote_plus(record['s3']['object']['key'], encoding='utf-8')
         
         accepted_extensions = ['png', 'jpg', 'jpeg']
-        if os.path.splitext(key)[1].lower() not in accepted_extensions:
+        if os.path.splitext(key)[1].lower().lstrip('.') not in accepted_extensions:
             raise TypeError(f"Rekognition cannot process [{key}]. Extension must one of [{accepted_extensions}].")
 
         response = rekognition.search_faces_by_image(CollectionId='beautiful_faces',
