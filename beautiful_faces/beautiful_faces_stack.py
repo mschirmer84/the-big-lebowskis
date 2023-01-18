@@ -34,8 +34,7 @@ class BeautifulFacesStack(Stack):
                                     handler='lambda.handler',
                                     code=_lambda.Code.from_asset(os.path.join("./", "detect-faces-lambda")),
                                     environment={
-                                        'table': faces_table.table_name,
-                                        'bucket': faces_bucket.bucket_name,
+                                        'table': faces_table.table_name
                                         },
                                     )
         faces_bucket.add_event_notification(_s3.EventType.OBJECT_CREATED, _s3n.LambdaDestination(faces_lambda))
@@ -51,8 +50,7 @@ class BeautifulFacesStack(Stack):
                                     handler='lambda.handler',
                                     code=_lambda.Code.from_asset(os.path.join("./", "frontend-api-lambda")),
                                     environment={
-                                        'table': faces_table.table_name,
-                                        'bucket': faces_bucket.bucket_name,
+                                        'table': faces_table.table_name
                                         },
                                     )
         faces_table.grant_read_data(frontend_api_lambda)
